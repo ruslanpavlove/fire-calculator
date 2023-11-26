@@ -40,9 +40,9 @@ public class Main {
 
                 capital -= expenses; // Изымание денег из капитала на расходы
 
-                capital *= (Constants.MOEX_RATE[yearIndex + 1] / Constants.MOEX_RATE[yearIndex]); // Корректировка капитала на прирост
+                capital *= (Constants.MOEX_RATE[yearIndex + 1]/ Constants.MOEX_RATE[yearIndex]) ; // Корректировка капитала на прирост
 
-                capital *= (1 - Constants.INFLATION_RATE[yearIndex] / 100); // Индексация на инфляцию
+                //capital *= (1 - Constants.INFLATION_RATE[yearIndex] / 100); // Индексация на инфляцию
 
                 if (capital < 0) {
                     isPositiveBalance = false; // Проверка на устойчивость капитала
