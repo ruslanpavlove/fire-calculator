@@ -1,19 +1,23 @@
 import java.util.Scanner;
 
 public class Main {
+    private static final int START_YEAR_MIN = 2002;
+    private static final int START_YEAR_MAX = 2021;
+    private static final double INITIAL_CAPITAL = 1;
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Input:");
+        System.out.print("Введите год начала жизни на проценты (" + START_YEAR_MIN + "-" + START_YEAR_MAX + "): ");
         try {
             String inputYear = scanner.nextLine();
             int startYear = Integer.parseInt(inputYear);
-            if (startYear < 2002 || startYear > 2021) {
-                throw new IllegalArgumentException("Output:\nthrows Exception…");
+            if (startYear < START_YEAR_MIN || startYear > START_YEAR_MAX) {
+                throw new IllegalArgumentException("Год должен быть в диапазоне " + START_YEAR_MIN + "-" + START_YEAR_MAX + "!");
             }
             double maxWithdrawal = withdrawal(startYear);
-            System.out.print("Output:\n" + maxWithdrawal);
+            System.out.printf("Максимальный процент изъятия: %.1f%%", maxWithdrawal);
         } catch (NumberFormatException e) {
-            System.out.print("Output:\nthrows Exception…");
+            System.out.print("Неправильный формат ввода!");
         } catch (IllegalArgumentException e) {
             System.out.print(e.getMessage());
         }
@@ -21,36 +25,32 @@ public class Main {
     }
 
     private static double withdrawal(int startYear) {
-        double withdrawalPercent = 100; // 100 / (2022 - startYear) + 5; // Начальное предположение процента изъятия
-        double initialCapital = 1; // Начальный капитал
+        double withdrawalPercent = 100;
         double capital;
         double expenses;
 
-        for (double percent = withdrawalPercent; percent > 0; percent = percent - 0.5) { // Перебор процентов
-            capital = initialCapital;
+        for (double percent = withdrawalPercent; percent > 0; percent = percent - 0.5) {
+            capital = INITIAL_CAPITAL;
             expenses = capital * (percent / 100);
-            boolean isPositiveBalance = true; // Флаг устойчивости капитала
-            boolean isFirstYear = true; // Флаг первого года
+            boolean isPositiveBalance = true;
+            boolean isFirstYear = true;
 
-            for (int yearIndex = startYear - 2002; yearIndex < Constants.INFLATION_RATE.length - 1; yearIndex++) {
+            for (int yearIndex = startYear - START_YEAR_MIN; yearIndex < Constants.INFLATION_RATE.length - 1; yearIndex++) {
                 if (isFirstYear == false) {
-                    expenses *= (1 + Constants.INFLATION_RATE[yearIndex - 1] / 100); // Корректировка расходов с учетом инфляции, в первый год не учитывается
+                    expenses *= (1 + Constants.INFLATION_RATE[yearIndex - 1] / 100);
                 }
                 isFirstYear = false;
 
-                capital -= expenses; // Изымание денег из капитала на расходы
-
-                capital *= (Constants.MOEX_RATE[yearIndex + 1]/ Constants.MOEX_RATE[yearIndex]) ; // Корректировка капитала на прирост
-
-                //capital *= (1 - Constants.INFLATION_RATE[yearIndex] / 100); // Индексация на инфляцию
+                capital -= expenses;
+                capital *= (Constants.MOEX_RATE[yearIndex + 1] / Constants.MOEX_RATE[yearIndex]);
 
                 if (capital < 0) {
-                    isPositiveBalance = false; // Проверка на устойчивость капитала
+                    isPositiveBalance = false;
                     break;
                 }
             }
             if (isPositiveBalance) {
-                withdrawalPercent = percent; // Выход из цикла, когда найден процент при котором итоговый капитал >= 0
+                withdrawalPercent = percent;
                 break;
             }
         }
